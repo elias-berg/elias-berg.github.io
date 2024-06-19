@@ -2,12 +2,20 @@
 
 * {
   margin: 0;
+  box-sizing: border-box;
+  line-height: 125%;
 }
 
 body {
-  margin: 0;
-  height: 100%;
+  max-width: 1000px;
+  margin: auto;
   font-family: Arial, Helvetica, sans-serif;
+  border: 1px solid black;
+}
+@media print {
+  body {
+    border: none;
+  }
 }
 
 body > div {
@@ -32,10 +40,6 @@ ul {
 }
 
 /* Class Styles */
-
-body > div:not(.footer) {
-  border-bottom: 1px solid black;
-}
 
 .section-header {
   width: fit-content;
@@ -101,13 +105,16 @@ body > div:not(.footer) {
 }
 
 .experiences {
-  font-size: 16px;
+  font-size: 15px;
   margin-top: 5px;
+}
+.experiences > li {
+  margin-bottom: 5px;
 }
 
 .divider {
   height: 0px;
-  border-bottom: 1px dashed black;
+  /*border-bottom: 1px dashed black;*/
   margin: 10px;
 }
 
@@ -115,36 +122,17 @@ body > div:not(.footer) {
   display: flex;
   flex-direction: row;
   flex-flow: wrap;
-  font-size: 16px;
+  font-size: 14px;
+  gap: 5px;
 }
 
-.skill-list > p + p:before {
-  content: " - ";
+.skill-list > p {
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 10px;
 }
 
 .footer {
   font-size: 10px;
   text-align: center;
-}
-
-/* Syles exclusively for CV */
-
-.employer-header {
-  background-color: whitesmoke;
-  border-bottom: 2px dashed black !important;
-}
-
-/* Zebra-stripe the projects */
-.projects > :nth-child(2n) {
-  background-color: snow;
-}
-
-.projects > h3 {
-  padding: 2px;
-  margin-bottom: 5px;
-}
-
-.projects > div {
-  border-left: 5px solid black;
-  padding-left: 5px;
 }
