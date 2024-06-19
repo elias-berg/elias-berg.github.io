@@ -1,0 +1,21 @@
+{
+  "title": "Intro",
+  "date": "20-02-2024",
+  "body": [
+    {
+      "header": "Hello, my name is Eli",
+      "body": [
+        "I've decided to start a personal blog to document my random adventures in both the real world and code.",
+        "I was inspired to start this personal blog after an otherwise ordinary daily standup meeting.",
+        "We were going over a design for some new development to work on when part of the design indicated development that was reminiscient of a serious issue we faced in the code before.",
+        "Namely, a data import spreadsheet was meant to allow users to import \"role\" data based on the role <i>name</i>...",
+        "My fellow developers may immediately think, \"But what if the role name changes?!\". Well, exactly.",
+        "So, naturally, I made the joke, \"There are Greek Mythologies that warn about this approach!\".",
+        "Everyone laughed. It was a good time. But really, there are mistakes we seem to make again and again, especially in code.",
+        "Hence, I'm using this blog partly as a creative outlet for some of these stories, partly for the fun of it!",
+        "This blog, itself, is also a development project since I'm writing the entire site from scratch, so apologies if it's buggy or not mobile optimized...",
+        "But otherwise, hope you enjoy!"
+      ]
+    }
+  ]
+}
