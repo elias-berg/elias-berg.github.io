@@ -26,7 +26,7 @@ li + li {
   margin-top: 2px; /* Change this to make it exactly a page in size */
 }
 
-p, span {
+span {
   padding: 2px;
 }
 
@@ -40,6 +40,13 @@ ul {
 }
 
 /* Class Styles */
+
+.header-image {
+  border-radius: 100px;
+  height: 80px;
+  width: 80px;
+  margin-right: 10px;
+}
 
 .section-header {
   width: fit-content;
@@ -95,7 +102,6 @@ ul {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 2px;
 }
 
 .icon-text > img {
@@ -124,6 +130,7 @@ ul {
   flex-flow: wrap;
   font-size: 14px;
   gap: 5px;
+  margin: 5px 0px;
 }
 
 .skill-list > p {
