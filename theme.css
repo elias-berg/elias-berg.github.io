@@ -1,0 +1,7 @@
+/* Global styles for the website */
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+  line-height: 125%;
+}
