@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Medication Schedule Tracker</title>
+
+    <link rel="stylesheet" href="medications.css" />
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="topbar">
+        <h1>Medication Schedule Tracker</h1>
+
+        <div class="menu-container">
+          <button id="menuButton" class="menu-button">⋯</button>
+
+          <div id="menuDropdown" class="menu-dropdown">
+            <button id="exportBtn">Export Data</button>
+
+            <button id="importBtn">
+              Import Data
+              <input type="file" id="importFile" accept=".json" hidden />
+            </button>
+
+            <button
+              id="showPastWrapper"
+              class="checkbox-item"
+              onclick="document.getElementById('showPastDates').click()"
+            >
+              <input type="checkbox" id="showPastDates" />
+              Show Past Dates
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="table">
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+
+      <div id="addMedicationDock" class="add-medication-dock">
+        <div id="addMedicationToggle" class="add-medication-toggle">
+          <span id="addMedicationArrow">▼</span>
+          <span>Add Medication</span>
+        </div>
+
+        <div id="addMedicationContent" class="add-medication-content collapsed">
+          <div class="add-medication-grid">
+            <div class="field">
+              <label for="newName">Medication Name</label>
+              <input
+                id="newName"
+                maxlength="100"
+                placeholder="e.g. Ibuprofen"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="newFor">Purpose</label>
+              <input
+                id="newFor"
+                maxlength="120"
+                placeholder="e.g. Pain relief"
+              />
+            </div>
+
+            <div class="field double-field">
+              <div>
+                <label for="newDoseAmount">Single Dose Amount</label>
+                <input
+                  id="newDoseAmount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="e.g. 500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label for="newDoseUnit">Units</label>
+                <input
+                  id="newDoseUnit"
+                  maxlength="20"
+                  placeholder="e.g. mg, ml, %"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="newDosage">Dose Taken Each Time</label>
+              <input
+                id="newDosage"
+                maxlength="100"
+                placeholder="e.g. 2 tablets"
+              />
+            </div>
+
+            <div class="field double-field">
+              <div class="prn-checkbox-wrap">
+                <label for="newPrn">PRN?</label>
+
+                <input type="checkbox" id="newPrn" />
+              </div>
+
+              <div id="frequencyWrap" class="flex-field">
+                <label for="newFrequency">Times Per Day</label>
+
+                <input
+                  id="newFrequency"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 3"
+                />
+              </div>
+
+              <div id="limitWrap" class="flex-field hidden">
+                <label for="newLimit">Daily Dosage Limit</label>
+
+                <input
+                  id="newLimit"
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 5"
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="newEndDate">End Date</label>
+
+              <input id="newEndDate" type="date" required />
+            </div>
+
+            <div class="field instructions-field">
+              <label for="newInstructions">Instructions</label>
+
+              <textarea
+                id="newInstructions"
+                maxlength="1000"
+                placeholder="e.g. Take with food, take once every 6 hours, etc."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="add-medication-actions">
+            <button id="addMedicationBtn">Save Medication</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="deleteModal" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-title">Delete Medication</div>
+
+        <div class="modal-body" id="deleteModalText">Are you sure?</div>
+
+        <div class="modal-actions">
+          <button id="confirmDeleteBtn" class="danger-btn">Yes</button>
+
+          <button id="cancelDeleteBtn">No</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="data.js"></script>
+
+    <script>
+      // ======================================
+      // CONFIG
+      // ======================================
+
+      const MEDICATIONS_STORAGE_KEY = "med_tracker_medications";
+      const STORAGE_KEY = "med_tracker_data";
+
+      const DAYS_FORWARD = 30;
+
+      // ======================================
+      // MEDICATIONS
+      // ======================================
+
+      function loadMedications() {
+        try {
+          const stored = JSON.parse(
+            localStorage.getItem(MEDICATIONS_STORAGE_KEY),
+          );
+
+          if (Array.isArray(stored)) {
+            return stored;
+          }
+        } catch {}
+
+        localStorage.setItem(
+          MEDICATIONS_STORAGE_KEY,
+          JSON.stringify(DEFAULT_MEDICATIONS),
+        );
+
+        return DEFAULT_MEDICATIONS;
+      }
+
+      function saveMedications() {
+        localStorage.setItem(
+          MEDICATIONS_STORAGE_KEY,
+          JSON.stringify(MEDICATIONS),
+        );
+      }
+
+      let MEDICATIONS = loadMedications();
+
+      // ======================================
+      // STORAGE
+      // ======================================
+
+      function loadStorage() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        } catch {
+          return {};
+        }
+      }
+
+      function saveStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+      }
+
+      function sortAllSavedData() {
+        Object.values(savedData).forEach((drugMap) => {
+          Object.keys(drugMap).forEach((dateStr) => {
+            if (Array.isArray(drugMap[dateStr])) {
+              drugMap[dateStr] = drugMap[dateStr].filter(Boolean).sort();
+            }
+          });
+        });
+      }
+
+      let savedData = loadStorage();
+
+      // ======================================
+      // DATE HELPERS
+      // ======================================
+
+      function cloneDate(d) {
+        return new Date(d.getTime());
+      }
+
+      function today() {
+        const d = new Date();
+
+        d.setHours(0, 0, 0, 0);
+
+        return d;
+      }
+
+      function parseDate(str) {
+        const d = new Date(str);
+
+        d.setHours(0, 0, 0, 0);
+
+        return d;
+      }
+
+      function formatDate(date) {
+        return date.toISOString().split("T")[0];
+      }
+
+      function prettyDate(date) {
+        return date.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      }
+
+      // ======================================
+      // PAST DATES
+      // ======================================
+
+      function getFirstSavedDate() {
+        let earliest = null;
+
+        Object.values(savedData).forEach((drugMap) => {
+          Object.keys(drugMap).forEach((dateStr) => {
+            const d = parseDate(dateStr);
+
+            if (!earliest || d < earliest) {
+              earliest = d;
+            }
+          });
+        });
+
+        return earliest;
+      }
+
+      function updatePastDatesAvailability() {
+        const wrapper = document.getElementById("showPastWrapper");
+
+        const checkbox = document.getElementById("showPastDates");
+
+        const earliest = getFirstSavedDate();
+
+        const t = today();
+
+        const hasPastDates = earliest && earliest < t;
+
+        if (hasPastDates) {
+          wrapper.classList.remove("disabled");
+
+          checkbox.disabled = false;
+        } else {
+          wrapper.classList.add("disabled");
+
+          checkbox.disabled = true;
+
+          checkbox.checked = false;
+        }
+      }
+
+      function getDateRange() {
+        const t = today();
+
+        const checkbox = document.getElementById("showPastDates");
+
+        const dates = [];
+
+        if (checkbox.checked) {
+          const uniquePastDates = new Set();
+
+          Object.values(savedData).forEach((drugMap) => {
+            Object.keys(drugMap).forEach((dateStr) => {
+              const d = parseDate(dateStr);
+
+              if (d < t) {
+                uniquePastDates.add(dateStr);
+              }
+            });
+          });
+
+          const sortedPastDates = Array.from(uniquePastDates).sort();
+
+          sortedPastDates.forEach((dateStr) => {
+            dates.push(parseDate(dateStr));
+          });
+        }
+
+        for (let i = 0; i <= DAYS_FORWARD; i++) {
+          const d = cloneDate(t);
+
+          d.setDate(d.getDate() + i);
+
+          dates.push(d);
+        }
+
+        return dates;
+      }
+
+      // ======================================
+      // DOSE COUNT
+      // ======================================
+
+      function getDoseCount(drug) {
+        if (drug.frequency["prn?"]) {
+          return drug.frequency.limit || 0;
+        }
+
+        return drug.frequency.amount || 0;
+      }
+
+      // ======================================
+      // STORAGE PATH
+      // ======================================
+
+      function ensurePath(drugName, dateStr) {
+        if (!savedData[drugName]) {
+          savedData[drugName] = {};
+        }
+
+        if (!savedData[drugName][dateStr]) {
+          savedData[drugName][dateStr] = [];
+        }
+      }
+
+      // ======================================
+      // ADD MEDICATION
+      // ======================================
+
+      function clearMedicationForm() {
+        document.getElementById("newName").value = "";
+        document.getElementById("newFor").value = "";
+        document.getElementById("newDoseAmount").value = "";
+        document.getElementById("newDoseUnit").value = "";
+        document.getElementById("newDosage").value = "";
+        document.getElementById("newFrequency").value = "";
+        document.getElementById("newLimit").value = "";
+        document.getElementById("newInstructions").value = "";
+        document.getElementById("newEndDate").value = "";
+        document.getElementById("newPrn").checked = false;
+
+        updatePrnMode();
+      }
+
+      function updatePrnMode() {
+        const isPrn = document.getElementById("newPrn").checked;
+
+        document
+          .getElementById("frequencyWrap")
+          .classList.toggle("hidden", isPrn);
+
+        document.getElementById("limitWrap").classList.toggle("hidden", !isPrn);
+      }
+
+      function validateMedicationForm() {
+        const name = document.getElementById("newName").value.trim();
+
+        const doseAmount = parseFloat(
+          document.getElementById("newDoseAmount").value,
+        );
+
+        const doseUnit = document.getElementById("newDoseUnit").value.trim();
+
+        const endDate = document.getElementById("newEndDate").value;
+
+        const isPrn = document.getElementById("newPrn").checked;
+
+        const frequency = parseInt(
+          document.getElementById("newFrequency").value,
+        );
+
+        const limit = parseInt(document.getElementById("newLimit").value);
+
+        if (!name) {
+          alert("Medication name is required.");
+          return false;
+        }
+
+        if (Number.isNaN(doseAmount) || doseAmount <= 0) {
+          alert("Single dose amount must be greater than 0.");
+          return false;
+        }
+
+        if (!doseUnit) {
+          alert("Dose units are required.");
+          return false;
+        }
+
+        if (!endDate) {
+          alert("End date is required.");
+          return false;
+        }
+
+        if (isPrn) {
+          if (Number.isNaN(limit) || limit <= 0) {
+            alert("Daily limit must be greater than 0.");
+            return false;
+          }
+        } else {
+          if (Number.isNaN(frequency) || frequency <= 0) {
+            alert("Times per day must be greater than 0.");
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      // ======================================
+      // RENDER
+      // ======================================
+
+      function render() {
+        const thead = document.getElementById("thead");
+        const tbody = document.getElementById("tbody");
+
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+
+        const dates = getDateRange();
+
+        const todayStr = formatDate(today());
+
+        // ====================================
+        // HEADER
+        // ====================================
+
+        const hr = document.createElement("tr");
+
+        const th = document.createElement("th");
+
+        th.textContent = "Medication";
+
+        th.className = "sticky sticky-header col-drug";
+
+        hr.appendChild(th);
+
+        dates.forEach((date) => {
+          const th = document.createElement("th");
+
+          th.className = "date-cell";
+
+          if (formatDate(date) === todayStr) {
+            th.classList.add("today-header");
+          }
+
+          th.innerHTML = `
+            <div class="header-date">
+              ${prettyDate(date)}
+            </div>
+
+            <div class="header-day">
+              ${date.toLocaleDateString(undefined, {
+                weekday: "short",
+              })}
+            </div>
+          `;
+
+          hr.appendChild(th);
+        });
+
+        thead.appendChild(hr);
+
+        // ====================================
+        // ROWS
+        // ====================================
+
+        MEDICATIONS.forEach((drug) => {
+          const tr = document.createElement("tr");
+
+          const medTd = document.createElement("td");
+
+          medTd.className = "sticky col-drug";
+
+          medTd.innerHTML = `
+            <button
+              class="delete-med-btn"
+              data-drug="${drug.name}"
+              title="Delete medication"
+            >
+              ×
+            </button>
+
+            <div class="drug-name">
+              ${drug.name}
+            </div>
+
+            <div class="drug-detail">
+              <span class="drug-label">Dose:</span>
+              <span class="drug-value">
+                ${drug.dose.amount} ${drug.dose.unit}
+              </span>
+            </div>
+
+            ${
+              drug.for
+                ? `
+                <div class="drug-detail">
+                  <span class="drug-label">Purpose:</span>
+                  <span class="drug-value">
+                    ${drug.for}
+                  </span>
+                </div>
+              `
+                : ""
+            }
+
+            <div class="drug-detail">
+              <span class="drug-label">Frequency:</span>
+              <span class="drug-value">
+                ${
+                  drug.frequency["prn?"]
+                    ? `PRN (${drug.frequency.limit}/day)`
+                    : `${drug.frequency.amount}x daily`
+                }
+              </span>
+            </div>
+
+            ${
+              drug.instructions
+                ? `
+                <div class="drug-instructions">
+                  <label>Instructions</label>
+                  ${drug.instructions}
+                </div>
+              `
+                : ""
+            }
+          `;
+
+          tr.appendChild(medTd);
+
+          const endDate = parseDate(drug.end_date);
+
+          dates.forEach((date) => {
+            const td = document.createElement("td");
+
+            td.className = "date-cell";
+
+            if (date > endDate) {
+              td.classList.add("expired");
+
+              tr.appendChild(td);
+
+              return;
+            }
+
+            const dateStr = formatDate(date);
+
+            const count = getDoseCount(drug);
+
+            const wrap = document.createElement("div");
+
+            wrap.className = "inputs";
+
+            const isToday = dateStr === todayStr;
+
+            if (isToday) {
+              ensurePath(drug.name, dateStr);
+            }
+
+            const storedTimes = savedData?.[drug.name]?.[dateStr] || [];
+
+            for (let i = 0; i < count; i++) {
+              const input = document.createElement("input");
+
+              input.type = "time";
+
+              input.value = storedTimes[i] || "";
+
+              if (!isToday) {
+                input.disabled = true;
+              } else {
+                input.addEventListener("change", () => {
+                  ensurePath(drug.name, dateStr);
+
+                  const allTimes = Array.from(
+                    wrap.querySelectorAll('input[type="time"]'),
+                  )
+                    .map((i) => i.value)
+                    .filter(Boolean);
+
+                  savedData[drug.name][dateStr] = allTimes;
+
+                  saveStorage();
+
+                  updatePastDatesAvailability();
+                });
+              }
+
+              wrap.appendChild(input);
+            }
+
+            td.appendChild(wrap);
+
+            tr.appendChild(td);
+          });
+
+          tbody.appendChild(tr);
+        });
+      }
+
+      // ======================================
+      // EXPORT
+      // ======================================
+
+      function exportData() {
+        const blob = new Blob([JSON.stringify(savedData, null, 2)], {
+          type: "application/json",
+        });
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        a.href = url;
+
+        a.download = "medication-tracker-export.json";
+
+        a.click();
+
+        URL.revokeObjectURL(url);
+      }
+
+      // ======================================
+      // IMPORT
+      // ======================================
+
+      function importData(file) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          try {
+            savedData = JSON.parse(e.target.result);
+
+            init();
+
+            alert("Import successful");
+          } catch {
+            alert("Invalid JSON");
+          }
+        };
+
+        reader.readAsText(file);
+      }
+
+      // ======================================
+      // MENU
+      // ======================================
+
+      const menuButton = document.getElementById("menuButton");
+      const menuDropdown = document.getElementById("menuDropdown");
+
+      menuButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        menuDropdown.classList.toggle("open");
+      });
+
+      document.addEventListener("click", () => {
+        menuDropdown.classList.remove("open");
+      });
+
+      menuDropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      // ======================================
+      // EVENTS
+      // ======================================
+
+      document
+        .getElementById("exportBtn")
+        .addEventListener("click", exportData);
+
+      document.getElementById("importFile").addEventListener("change", (e) => {
+        if (e.target.files[0]) {
+          importData(e.target.files[0]);
+        }
+      });
+
+      document.getElementById("importBtn").addEventListener("click", () => {
+        document.getElementById("importFile").click();
+      });
+
+      document
+        .getElementById("showPastDates")
+        .addEventListener("change", render);
+
+      document
+        .getElementById("newPrn")
+        .addEventListener("change", updatePrnMode);
+
+      document
+        .getElementById("addMedicationToggle")
+        .addEventListener("click", () => {
+          const content = document.getElementById("addMedicationContent");
+
+          const arrow = document.getElementById("addMedicationArrow");
+
+          const collapsed = content.classList.toggle("collapsed");
+
+          arrow.textContent = collapsed ? "▼" : "▲";
+        });
+
+      document
+        .getElementById("addMedicationBtn")
+        .addEventListener("click", () => {
+          if (!validateMedicationForm()) {
+            return;
+          }
+
+          const isPrn = document.getElementById("newPrn").checked;
+
+          const medication = {
+            name: document.getElementById("newName").value.trim(),
+
+            for: document.getElementById("newFor").value.trim(),
+
+            dose: {
+              amount: parseFloat(
+                document.getElementById("newDoseAmount").value,
+              ),
+
+              unit: document.getElementById("newDoseUnit").value.trim(),
+            },
+
+            dosage: document.getElementById("newDosage").value.trim(),
+
+            frequency: isPrn
+              ? {
+                  "prn?": true,
+
+                  limit: parseInt(document.getElementById("newLimit").value),
+                }
+              : {
+                  "prn?": false,
+
+                  amount: parseInt(
+                    document.getElementById("newFrequency").value,
+                  ),
+                },
+
+            instructions: document
+              .getElementById("newInstructions")
+              .value.trim(),
+
+            end_date: document.getElementById("newEndDate").value,
+          };
+
+          MEDICATIONS.push(medication);
+
+          saveMedications();
+
+          clearMedicationForm();
+
+          render();
+        });
+
+      // ======================================
+      // DELETE MEDICATION
+      // ======================================
+
+      let medicationPendingDelete = null;
+
+      const deleteModal = document.getElementById("deleteModal");
+
+      const deleteModalText = document.getElementById("deleteModalText");
+
+      const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+      const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+
+      document.addEventListener("click", (e) => {
+        const deleteBtn = e.target.closest(".delete-med-btn");
+
+        if (!deleteBtn) {
+          return;
+        }
+
+        medicationPendingDelete = deleteBtn.dataset.drug;
+
+        deleteModalText.textContent = `Are you sure you want to delete "${medicationPendingDelete}"?`;
+
+        deleteModal.classList.remove("hidden");
+      });
+
+      cancelDeleteBtn.addEventListener("click", () => {
+        medicationPendingDelete = null;
+
+        deleteModal.classList.add("hidden");
+      });
+
+      confirmDeleteBtn.addEventListener("click", () => {
+        if (!medicationPendingDelete) {
+          return;
+        }
+
+        MEDICATIONS = MEDICATIONS.filter(
+          (m) => m.name !== medicationPendingDelete,
+        );
+
+        saveMedications();
+
+        deleteModal.classList.add("hidden");
+
+        medicationPendingDelete = null;
+
+        render();
+      });
+
+      deleteModal.addEventListener("click", (e) => {
+        if (e.target === deleteModal) {
+          deleteModal.classList.add("hidden");
+
+          medicationPendingDelete = null;
+        }
+      });
+
+      // ======================================
+      // INIT
+      // ======================================
+
+      function init() {
+        sortAllSavedData();
+
+        saveStorage();
+
+        updatePastDatesAvailability();
+
+        updatePrnMode();
+
+        render();
+      }
+
+      init();
+    </script>
+  </body>
+</html>

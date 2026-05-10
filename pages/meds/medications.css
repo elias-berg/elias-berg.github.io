@@ -1,0 +1,478 @@
+:root {
+  --border: #cfcfcf;
+  --header-bg: #e7edf8;
+  --today-bg: #cfe8c8;
+  --sticky-bg: #f7f7f7;
+  --date-col: 180px;
+  --font: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: white;
+}
+
+.page {
+  padding: 16px;
+}
+
+/* ======================================
+   TOP BAR
+====================================== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.menu-container {
+  position: relative;
+}
+
+.menu-button {
+  width: 42px;
+  height: 42px;
+  font-size: 28px;
+  line-height: 1;
+  border-radius: 8px;
+  border: 1px solid #999;
+  background: #f3f3f3;
+  cursor: pointer;
+}
+
+.menu-button:hover {
+  background: #e7e7e7;
+}
+
+.menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  min-width: 220px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.menu-dropdown.open {
+  display: block;
+}
+
+.menu-dropdown button {
+  width: 100%;
+  display: block;
+  padding: 12px;
+  border: none;
+  background: white;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.menu-dropdown button:hover {
+  background: #f5f5f5;
+}
+
+.checkbox-item {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+#showPastWrapper.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ======================================
+   TABLE
+====================================== */
+
+.table-wrapper {
+  border-top: 1px solid var(--border);
+  overflow: auto;
+  height: calc(100vh - 85px);
+  background: white;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+}
+
+th,
+td {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 10px;
+  vertical-align: top;
+  background: white;
+  white-space: normal;
+  word-break: break-word;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--header-bg);
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.today-header {
+  background: var(--today-bg) !important;
+}
+
+.sticky {
+  position: sticky;
+  background: var(--sticky-bg);
+  z-index: 30;
+}
+
+.sticky-header {
+  z-index: 60 !important;
+}
+
+.date-cell {
+  width: var(--date-col);
+  min-width: var(--date-col);
+  max-width: var(--date-col);
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+input[type="time"] {
+  width: 100%;
+}
+
+input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #f3f3f3;
+}
+
+.expired {
+  background: black !important;
+}
+
+.expired * {
+  display: none;
+}
+
+/* ======================================
+   MEDICATION CELL
+====================================== */
+
+.drug-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.drug-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.drug-label {
+  font-size: 11px;
+  font-weight: normal;
+  color: #666;
+}
+
+.drug-value {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.drug-instructions {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drug-instructions label {
+  font-size: 11px;
+  color: #666;
+  text-decoration: underline;
+}
+
+.drug-instructions div {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.header-date {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.header-day {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* ======================================
+   ADD MEDICATION
+====================================== */
+
+.add-medication-dock {
+  width: 100%;
+  background: white;
+  border-top: 1px solid #d0d0d0;
+  padding: 12px;
+}
+
+.add-medication-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+
+.add-medication-content {
+  margin-top: 16px;
+}
+
+.add-medication-content.collapsed {
+  display: none;
+}
+
+.add-medication-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  text-align: left;
+}
+
+.field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.instructions-field {
+  grid-column: 1 / -1;
+}
+
+.double-field {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.double-field > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prn-checkbox-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prn-checkbox-wrap input {
+  width: 42px;
+  height: 42px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.flex-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.add-medication-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-medication-actions button {
+  padding: 10px 16px;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ======================================
+   MEDICATION CELL
+====================================== */
+
+.col-drug {
+  position: sticky;
+  left: 0;
+  min-width: 180px;
+  overflow: visible;
+}
+
+.sticky.col-drug {
+  position: sticky;
+  left: 0;
+}
+
+td.col-drug {
+  position: sticky;
+}
+
+.delete-med-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  width: 22px;
+  height: 22px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #e53935;
+  color: white;
+
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  z-index: 100;
+
+  padding: 0;
+
+  opacity: 0.85;
+}
+
+.delete-med-btn:hover {
+  background: #c62828;
+  opacity: 1;
+}
+
+/* ======================================
+   MODAL
+====================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-actions button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+  background: white;
+  cursor: pointer;
+  font: inherit;
+}
+
+.modal-actions button:hover {
+  background: #f5f5f5;
+}
+
+.danger-btn {
+  background: #e53935 !important;
+  color: white;
+  border-color: #e53935 !important;
+}
+
+.danger-btn:hover {
+  background: #c62828 !important;
+}
