@@ -251,6 +251,23 @@
       // DATE HELPERS
       // ======================================
 
+      function normalizeTime(v) {
+        if (!v) return "";
+
+        v = v.trim();
+
+        // convert 930 → 09:30
+        if (/^\d{3,4}$/.test(v)) {
+          v = v.padStart(4, "0");
+          v = v.slice(0, 2) + ":" + v.slice(2);
+        }
+
+        // validate 24-hour format
+        const match = v.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+
+        return match ? `${match[1]}:${match[2]}` : "";
+      }
+
       function cloneDate(d) {
         return new Date(d.getTime());
       }
@@ -454,11 +471,6 @@
           return false;
         }
 
-        if (!endDate) {
-          alert("End date is required.");
-          return false;
-        }
-
         if (isPrn) {
           if (Number.isNaN(limit) || limit <= 0) {
             alert("Daily limit must be greater than 0.");
@@ -632,26 +644,46 @@
             for (let i = 0; i < count; i++) {
               const input = document.createElement("input");
 
-              input.type = "time";
+              input.type = "text";
+              input.placeholder = "HH:MM";
+              input.classList.add("time-input");
+              input.inputMode = "numeric";
+              input.pattern = "^([01]\\d|2[0-3]):[0-5]\\d$";
+              input.maxLength = 5;
               input.value = storedTimes[i] || "";
+
+              input.addEventListener("blur", () => {
+                let v = input.value.trim();
+
+                // basic normalization: allow 930 → 09:30
+                if (/^\d{3,4}$/.test(v)) {
+                  v = v.padStart(4, "0");
+                  v = v.slice(0, 2) + ":" + v.slice(2);
+                }
+
+                // validate HH:MM 24-hour
+                const match = v.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+
+                if (!match && v !== "") {
+                  alert("Use 24-hour format: HH:MM (00:00–23:59)");
+                  input.value = "";
+                  return;
+                }
+
+                input.value = v;
+              });
 
               if (!isToday) {
                 input.disabled = true;
               } else {
                 input.addEventListener("change", () => {
-                  ensurePath(drug.name, dateStr);
-
-                  const allTimes = Array.from(
-                    wrap.querySelectorAll('input[type="time"]'),
-                  )
-                    .map((i) => i.value)
+                  const allTimes = Array.from(wrap.querySelectorAll("input"))
+                    .map((i) => normalizeTime(i.value))
                     .filter(Boolean);
 
                   savedData[drug.name][dateStr] = allTimes;
 
                   saveStorage();
-
-                  updatePastDatesAvailability();
                 });
               }
 

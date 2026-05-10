@@ -3,7 +3,7 @@
   --header-bg: #e7edf8;
   --today-bg: #cfe8c8;
   --sticky-bg: #f7f7f7;
-  --date-col: 100px;
+  --date-col: 120px;
   --font: Arial, Helvetica, sans-serif;
 }
 
@@ -155,15 +155,24 @@ thead th {
 }
 
 .date-cell {
-  width: var(--date-col);
-  min-width: var(--date-col);
-  max-width: var(--date-col);
+  min-width: max-content;
+  white-space: nowrap;
+  margin: auto;
 }
 
 .inputs {
   display: flex;
   flex-direction: column;
+  width: 55px;
   gap: 8px;
+  align-items: flex-start;
+  margin: auto;
+}
+
+.time-input {
+  width: 55px; /* controls column width indirectly */
+  font-family: monospace;
+  text-align: center;
 }
 
 input[type="time"] {
@@ -311,7 +320,7 @@ input:disabled {
   gap: 10px;
 }
 
-.double-field > div {
+.double-field>div {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -475,4 +484,60 @@ td.col-drug {
 
 .danger-btn:hover {
   background: #c62828 !important;
+}
+
+/**
+ * PRINTING
+ */
+
+@media print {
+
+  /* Hide UI chrome */
+  .menu-container,
+  .add-medication-dock,
+  .delete-med-btn,
+  .modal-overlay {
+    display: none !important;
+  }
+
+  /* Remove background noise */
+  body {
+    background: white;
+  }
+
+  th,
+  td {
+    border: 1px solid #ccc;
+  }
+
+  /* Hide ALL empty time inputs */
+  input[type="time"]:not([value]),
+  input[type="time"][value=""] {
+    display: none !important;
+  }
+
+  /* Make table compact */
+  .table-wrapper {
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Remove expired black blocks */
+  .expired {
+    display: none !important;
+  }
+
+  /* Tighten spacing for print */
+  .inputs {
+    gap: 4px;
+  }
+
+  /* Optional: hide entire cell if nothing is filled */
+  input:placeholder-shown {
+    display: none;
+  }
+
+  input {
+    border: transparent;
+  }
 }
