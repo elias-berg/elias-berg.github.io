@@ -15,10 +15,21 @@
       <div class="topbar">
         <h1>Medication Schedule Tracker</h1>
 
+        <button id="jumpTodayBtn" class="jump-today-btn hidden">
+          Scroll to Today
+        </button>
+
         <div class="menu-container">
           <button id="menuButton" class="menu-button">⋯</button>
 
           <div id="menuDropdown" class="menu-dropdown">
+            <button id="exportMedsBtn">Export Medications</button>
+
+            <button id="importMedsBtn">
+              Import Medications
+              <input type="file" id="importFile" accept=".json" hidden />
+            </button>
+
             <button id="exportBtn">Export Data</button>
 
             <button id="importBtn">
@@ -26,14 +37,7 @@
               <input type="file" id="importFile" accept=".json" hidden />
             </button>
 
-            <button
-              id="showPastWrapper"
-              class="checkbox-item"
-              onclick="document.getElementById('showPastDates').click()"
-            >
-              <input type="checkbox" id="showPastDates" />
-              Show Past Dates
-            </button>
+            <button id="resetDataBtn" style="color: red">Reset All Data</button>
           </div>
         </div>
       </div>
@@ -217,6 +221,16 @@
         );
       }
 
+      function sortMedications() {
+        MEDICATIONS.sort((a, b) => {
+          const aKey = `${a.name} ${a.dose.amount}${a.dose.unit}`.toLowerCase();
+
+          const bKey = `${b.name} ${b.dose.amount}${b.dose.unit}`.toLowerCase();
+
+          return aKey.localeCompare(bKey);
+        });
+      }
+
       let MEDICATIONS = loadMedications();
 
       // ======================================
@@ -304,82 +318,51 @@
       // PAST DATES
       // ======================================
 
-      function getFirstSavedDate() {
-        let earliest = null;
+      function scrollToToday(auto = false) {
+        const wrapper = document.querySelector(".table-wrapper");
 
-        Object.values(savedData).forEach((drugMap) => {
-          Object.keys(drugMap).forEach((dateStr) => {
-            const d = parseDate(dateStr);
+        const todayHeader = document.querySelector(".today-header");
 
-            if (!earliest || d < earliest) {
-              earliest = d;
-            }
-          });
-        });
-
-        return earliest;
-      }
-
-      function updatePastDatesAvailability() {
-        const wrapper = document.getElementById("showPastWrapper");
-
-        const checkbox = document.getElementById("showPastDates");
-
-        const earliest = getFirstSavedDate();
-
-        const t = today();
-
-        const hasPastDates = earliest && earliest < t;
-
-        if (hasPastDates) {
-          wrapper.classList.remove("disabled");
-
-          checkbox.disabled = false;
-        } else {
-          wrapper.classList.add("disabled");
-
-          checkbox.disabled = true;
-
-          checkbox.checked = false;
+        if (!wrapper || !todayHeader) {
+          return;
         }
+
+        const left =
+          todayHeader.offsetLeft -
+          document.querySelector(".col-drug").offsetWidth;
+
+        wrapper.scrollTo({
+          left,
+          behavior: auto ? "auto" : "smooth",
+        });
       }
 
       function getDateRange() {
         const t = today();
 
-        const checkbox = document.getElementById("showPastDates");
-
         const dates = [];
 
-        if (checkbox.checked) {
-          const uniquePastDates = new Set();
+        const uniqueDates = new Set();
 
-          Object.values(savedData).forEach((drugMap) => {
-            Object.keys(drugMap).forEach((dateStr) => {
-              const d = parseDate(dateStr);
-
-              if (d < t) {
-                uniquePastDates.add(dateStr);
-              }
-            });
+        // include ALL saved past dates
+        Object.values(savedData).forEach((drugMap) => {
+          Object.keys(drugMap).forEach((dateStr) => {
+            uniqueDates.add(dateStr);
           });
+        });
 
-          const sortedPastDates = Array.from(uniquePastDates).sort();
-
-          sortedPastDates.forEach((dateStr) => {
-            dates.push(parseDate(dateStr));
-          });
-        }
-
+        // include future dates
         for (let i = 0; i <= DAYS_FORWARD; i++) {
           const d = cloneDate(t);
 
           d.setDate(d.getDate() + i);
 
-          dates.push(d);
+          uniqueDates.add(formatDate(d));
         }
 
-        return dates;
+        return Array.from(uniqueDates)
+          .sort()
+          .map((d) => parseDate(d));
       }
 
       // ======================================
@@ -398,13 +381,17 @@
       // STORAGE PATH
       // ======================================
 
-      function ensurePath(drugName, dateStr) {
-        if (!savedData[drugName]) {
-          savedData[drugName] = {};
+      function getMedicationKey(drug) {
+        return `${drug.name}__${drug.dose.amount}${drug.dose.unit}`;
+      }
+
+      function ensurePath(key, dateStr) {
+        if (!savedData[key]) {
+          savedData[key] = {};
         }
 
-        if (!savedData[drugName][dateStr]) {
-          savedData[drugName][dateStr] = [];
+        if (!savedData[key][dateStr]) {
+          savedData[key][dateStr] = [];
         }
       }
 
@@ -545,6 +532,8 @@
         // ROWS
         // ====================================
 
+        sortMedications();
+
         MEDICATIONS.forEach((drug) => {
           const tr = document.createElement("tr");
 
@@ -569,6 +558,14 @@
               <span class="drug-label">Dose:</span>
               <span class="drug-value">
                 ${drug.dose.amount} ${drug.dose.unit}
+              </span>
+            </div>
+
+
+            <div class="drug-detail">
+              <span class="drug-label">Dosage:</span>
+              <span class="drug-value">
+                ${drug.dosage}
               </span>
             </div>
 
@@ -601,7 +598,9 @@
                 ? `
                 <div class="drug-instructions">
                   <label>Instructions</label>
-                  ${drug.instructions}
+                  <span class="drug-value">
+                    ${drug.instructions}
+                  </span>
                 </div>
               `
                 : ""
@@ -610,14 +609,14 @@
 
           tr.appendChild(medTd);
 
-          const endDate = parseDate(drug.end_date);
+          const endDate = drug.end_date ? parseDate(drug.end_date) : null;
 
           dates.forEach((date) => {
             const td = document.createElement("td");
 
             td.className = "date-cell";
 
-            if (date > endDate) {
+            if (endDate && date > endDate) {
               td.classList.add("expired");
 
               tr.appendChild(td);
@@ -635,11 +634,12 @@
 
             const isToday = dateStr === todayStr;
 
+            const drugKey = getMedicationKey(drug);
             if (isToday) {
-              ensurePath(drug.name, dateStr);
+              ensurePath(drugKey, dateStr);
             }
 
-            const storedTimes = savedData?.[drug.name]?.[dateStr] || [];
+            const storedTimes = savedData?.[drugKey]?.[dateStr] || [];
 
             for (let i = 0; i < count; i++) {
               const input = document.createElement("input");
@@ -681,7 +681,7 @@
                     .map((i) => normalizeTime(i.value))
                     .filter(Boolean);
 
-                  savedData[drug.name][dateStr] = allTimes;
+                  savedData[getMedicationKey(drug)][dateStr] = allTimes;
 
                   saveStorage();
                 });
@@ -696,6 +696,10 @@
           });
 
           tbody.appendChild(tr);
+        });
+
+        requestAnimationFrame(() => {
+          scrollToToday(true);
         });
       }
 
@@ -783,10 +787,6 @@
       });
 
       document
-        .getElementById("showPastDates")
-        .addEventListener("change", render);
-
-      document
         .getElementById("newPrn")
         .addEventListener("change", updatePrnMode);
 
@@ -812,7 +812,7 @@
           const isPrn = document.getElementById("newPrn").checked;
 
           const medication = {
-            name: document.getElementById("newName").value.trim(),
+            name: document.getElementById("newName").value.toLowerCase().trim(),
 
             for: document.getElementById("newFor").value.trim(),
 
@@ -855,6 +855,30 @@
 
           render();
         });
+
+      document.getElementById("resetDataBtn").addEventListener("click", () => {
+        if (confirm("Are you sure you want to reset all data?")) {
+          localStorage.clear();
+          // Refresh the page to reset state and reinitialize with default data
+          window.navigation.navigate(".");
+        }
+      });
+
+      const tableWrapper = document.querySelector(".table-wrapper");
+
+      const jumpTodayBtn = document.getElementById("jumpTodayBtn");
+
+      tableWrapper.addEventListener("scroll", () => {
+        if (tableWrapper.scrollLeft > 150) {
+          jumpTodayBtn.classList.remove("hidden");
+        } else {
+          jumpTodayBtn.classList.add("hidden");
+        }
+      });
+
+      jumpTodayBtn.addEventListener("click", () => {
+        scrollToToday();
+      });
 
       // ======================================
       // DELETE MEDICATION
@@ -924,8 +948,6 @@
         sortAllSavedData();
 
         saveStorage();
-
-        updatePastDatesAvailability();
 
         updatePrnMode();
 
