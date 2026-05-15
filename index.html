@@ -1,14 +1,21 @@
 <html>
   <head>
     <title>Eli's Domain</title>
+    <link rel="icon" type="image/x-icon" href="favicon.png" />
 
     <link rel="stylesheet" href="../../theme.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <aside id="sidebar">
-      <div onclick="navigate('home')">Home</div>
-      <div onclick="navigate('resume')">Resume</div>
+      <div class="nav-item" onclick="navigate('home')">
+        <span class="icon"><img src="assets/home.svg" alt="Home" /></span>
+        <span class="text">Home</span>
+      </div>
+      <div class="nav-item" onclick="navigate('resume')">
+        <span class="icon"><img src="assets/file.svg" alt="Resume" /></span>
+        <span class="text">Resume</span>
+      </div>
     </aside>
 
     <iframe id="home" src="./pages/home/index.html"></iframe>
