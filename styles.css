@@ -3,16 +3,29 @@ body {
   scroll-behavior: smooth;
 }
 
-aside {
-  position: fixed;
-  top: 50%;
-  left: 0;
-  height: 100%;
-  z-index: 999;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/*
+  DESKTOP STYLES
+*/
+
+@media screen and (orientation: landscape) {
+  aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 999;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav-items {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+  }
 }
 
 aside > div {
@@ -52,4 +65,34 @@ iframe {
 
 .nav-item:hover .text {
   display: block;
+}
+
+/*
+  MOBILE STYLES 
+*/
+
+/* Applies when height > width (portrait mode) */
+@media screen and (orientation: portrait) {
+    iframe {
+      padding-bottom: 50px;
+    }
+    
+    aside {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      z-index: 999;
+      padding: 10px;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+    }
+
+    .nav-items {
+      display: flex;;
+      flex-direction: row;
+      width: 100%;
+      justify-content: center;
+    }
 }
