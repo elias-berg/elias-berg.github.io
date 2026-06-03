@@ -9,12 +9,12 @@
   <body>
     <aside id="sidebar">
       <div class="nav-items">
-        <div class="nav-item" onclick="navigate('home')">
-          <span class="icon"><img src="assets/home.svg" alt="Home" /></span>
+        <div id="nav-home" class="nav-item" onclick="navigate('home')">
+          <span class="icon" alt="home"></span>
           <span class="text">Home</span>
         </div>
-        <div class="nav-item" onclick="navigate('resume')">
-          <span class="icon"><img src="assets/file.svg" alt="Resume" /></span>
+        <div id="nav-resume" class="nav-item" onclick="navigate('resume')">
+          <span class="icon" alt="resume"></span>
           <span class="text">Resume</span>
         </div>
       </div>
@@ -25,8 +25,37 @@
 
     <!-- Scrolling logic -->
     <script>
+      // On page load, check if there's a hash in the URL and navigate to the corresponding section.
+      // This is mostly to ensure that in mobile mode, we show the active page in the menu at the bottom.
+      window.onload = () => {
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+          document
+            .getElementById(`nav-${hash}`)
+            .classList.toggle("active", true);
+        } else {
+          if (window.scrollY === 0) {
+            navigate("home");
+          } else if (window.scrollY > 0) {
+            navigate("resume");
+          }
+        }
+      };
+
       const navigate = (id) => {
         document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+
+        // Remove all active classes
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.classList.toggle("active", false);
+        });
+        document.getElementById(`nav-${id}`).classList.toggle("active", true);
+      };
+
+      let scrollTimeout;
+      const debounce = (func) => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(func, 100); // Adjust the debounce delay as needed
       };
 
       let lastScrollY = 0;
@@ -42,25 +71,28 @@
         const scrollingDown = lastScrollDirection > 0;
         const scrollingUp = !scrollingDown;
 
-        console.log({ scrollingDown, scrollingUp, scrollY: window.scrollY });
-        console.log({
-          homeTop: home.offsetTop,
-          resumeTop: resume.offsetTop,
-        });
+        /*
+          console.log({ scrollingDown, scrollingUp, scrollY: window.scrollY });
+          console.log({
+            homeTop: home.offsetTop,
+            resumeTop: resume.offsetTop,
+          });
+        */
 
         if (
           scrollingDown &&
-          window.scrollY > home.offsetTop &&
+          window.scrollY >= home.offsetTop &&
           window.scrollY < resume.offsetTop
         ) {
-          navigate("resume");
+          debounce(() => navigate("resume"));
         } else if (
           scrollingUp &&
           window.scrollY < resume.offsetTop &&
           window.scrollY > home.offsetTop
         ) {
-          navigate("home");
+          debounce(() => navigate("home"));
         }
+        // TODO: Add more scrolling logic here when more sections are added
       };
     </script>
   </body>

@@ -3,6 +3,39 @@ body {
   scroll-behavior: smooth;
 }
 
+aside > div {
+  user-select: none;
+  cursor: pointer;
+}
+
+iframe {
+  border: none;
+  position: sticky;
+  width: 100%;
+  height: 100%;
+}
+
+.nav-items {
+  gap: 10px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.nav-item .icon {
+  width: 24px;
+  height: 24px;
+  transition: width 0.2s ease, height 0.2s ease;
+}
+
+.nav-item .text {
+  display: none;
+}
+
 /*
   DESKTOP STYLES
 */
@@ -26,45 +59,17 @@ body {
     height: 100%;
     justify-content: center;
   }
-}
 
-aside > div {
-  user-select: none;
-  cursor: pointer;
-}
 
-iframe {
-  border: none;
-  position: sticky;
-  width: 100%;
-  height: 100%;
-}
+  .nav-item:hover .icon {
+    width: 32px;
+    height: 32px;
+    transition: width 0.2s ease, height 0.2s ease;
+  }
 
-.nav-item {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.nav-item .icon {
-  width: 24px;
-  height: 24px;
-  transition: width 0.2s ease, height 0.2s ease;
-}
-
-.nav-item .text {
-  display: none;
-}
-
-.nav-item:hover .icon {
-  width: 32px;
-  height: 32px;
-  transition: width 0.2s ease, height 0.2s ease;
-}
-
-.nav-item:hover .text {
-  display: block;
+  .nav-item:hover .text {
+    display: block;
+  }
 }
 
 /*
@@ -90,9 +95,48 @@ iframe {
     }
 
     .nav-items {
-      display: flex;;
+      display: flex;
       flex-direction: row;
       width: 100%;
       justify-content: center;
     }
+
+    .nav-item {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .nav-item.active .icon {
+      width: 32px;
+      height: 32px;
+      transition: width 0.2s ease, height 0.2s ease;
+    }
+
+    .nav-item.active .text {
+      display: block;
+    }
+}
+
+/*
+  ICON STYLES
+*/
+
+#nav-home .icon {
+  background-image: url("assets/home.svg");
+  background-size: cover;
+}
+#nav-home.active .icon {
+  background-image: url("assets/home-active.svg");
+  background-size: cover;
+}
+
+#nav-resume .icon {
+  background-image: url("assets/file.svg");
+  background-size: cover;
+}
+#nav-resume.active .icon {
+  background-image: url("assets/file-active.svg");
+  background-size: cover;
 }
