@@ -17,14 +17,26 @@
           <span class="icon" alt="resume"></span>
           <span class="text">Resume</span>
         </div>
+        <div id="nav-footer" class="nav-item" onclick="navigate('footer')">
+          <span class="icon" alt="footer"></span>
+          <span class="text">Links</span>
+        </div>
       </div>
     </aside>
 
     <iframe id="home" src="./pages/home/index.html"></iframe>
     <iframe id="resume" src="./pages/resume/index.html"></iframe>
+    <iframe id="footer" src="./pages/footer/index.html"></iframe>
 
     <!-- Scrolling logic -->
     <script>
+      // Get the pages for reference in the scroll logic
+      const home = document.getElementById("home");
+      const resume = document.getElementById("resume");
+      const footer = document.getElementById("footer");
+
+      const pages = [home, resume, footer];
+
       // On page load, check if there's a hash in the URL and navigate to the corresponding section.
       // This is mostly to ensure that in mobile mode, we show the active page in the menu at the bottom.
       window.onload = () => {
@@ -34,15 +46,23 @@
             .getElementById(`nav-${hash}`)
             .classList.toggle("active", true);
         } else {
-          if (window.scrollY === 0) {
-            navigate("home");
-          } else if (window.scrollY > 0) {
-            navigate("resume");
+          let min = Infinity;
+          let minPage = pages[0]; // Default to home page
+          for (let i = 0; i < pages.length; i++) {
+            const currentOffset = Math.abs(pages[i].offsetTop - window.scrollY);
+            if (currentOffset < min) {
+              min = currentOffset;
+              minPage = pages[i];
+            }
           }
+          navigate(minPage.id);
         }
       };
 
+      // Block cascading scrolling events when we're programmatically scrolling to a section after a menu click or debounce.
+      let isAutoScrolling = false;
       const navigate = (id) => {
+        isAutoScrolling = true;
         document.getElementById(id).scrollIntoView({ behavior: "smooth" });
 
         // Remove all active classes
@@ -61,12 +81,17 @@
       let lastScrollY = 0;
       let lastScrollDirection = 1; // 1 for down, -1 for up
       window.onscroll = (e) => {
+        if (isAutoScrolling) {
+          return;
+        }
         lastScrollDirection = window.scrollY - lastScrollY;
         lastScrollY = window.scrollY;
       };
       window.onscrollend = (e) => {
-        const home = document.getElementById("home");
-        const resume = document.getElementById("resume");
+        if (isAutoScrolling) {
+          isAutoScrolling = false;
+          return;
+        }
 
         const scrollingDown = lastScrollDirection > 0;
         const scrollingUp = !scrollingDown;
@@ -79,20 +104,27 @@
           });
         */
 
-        if (
-          scrollingDown &&
-          window.scrollY >= home.offsetTop &&
-          window.scrollY < resume.offsetTop
-        ) {
-          debounce(() => navigate("resume"));
-        } else if (
-          scrollingUp &&
-          window.scrollY < resume.offsetTop &&
-          window.scrollY > home.offsetTop
-        ) {
-          debounce(() => navigate("home"));
+        if (scrollingDown) {
+          for (let i = 0; i < pages.length - 1; i++) {
+            if (
+              window.scrollY >= pages[i].offsetTop &&
+              window.scrollY < pages[i + 1].offsetTop
+            ) {
+              debounce(() => navigate(pages[i + 1].id));
+              break;
+            }
+          }
+        } else if (scrollingUp) {
+          for (let i = pages.length - 1; i > 0; i--) {
+            if (
+              window.scrollY < pages[i].offsetTop &&
+              window.scrollY >= pages[i - 1].offsetTop
+            ) {
+              debounce(() => navigate(pages[i - 1].id));
+              break;
+            }
+          }
         }
-        // TODO: Add more scrolling logic here when more sections are added
       };
     </script>
   </body>

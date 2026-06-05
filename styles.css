@@ -12,7 +12,7 @@ iframe {
   border: none;
   position: sticky;
   width: 100%;
-  height: 100%;
+  height: 100vh;
 }
 
 .nav-items {
@@ -138,5 +138,14 @@ iframe {
 }
 #nav-resume.active .icon {
   background-image: url("assets/file-active.svg");
+  background-size: cover;
+}
+
+#nav-footer .icon {
+  background-image: url("assets/links.svg");
+  background-size: cover;
+}
+#nav-footer.active .icon {
+  background-image: url("assets/links-active.svg");
   background-size: cover;
 }
