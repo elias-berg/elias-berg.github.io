@@ -24,6 +24,10 @@ ul {
   padding-inline-start: 15px;
 }
 
+i {
+  display: block;
+}
+
 /* Class Styles */
 
 .header-image {
