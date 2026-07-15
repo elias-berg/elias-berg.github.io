@@ -6,10 +6,96 @@
   <body>
     <div class="header">
       <img src="assets/eli.jpeg" alt="Elias, himself" />
-      <div style="padding: 20px">
+      <div
+        style="
+          padding: 20px;
+          max-width: 600px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        "
+      >
         <h1>Hello!</h1>
-        <h2>My name is Elias Berg, "Eli" for short.</h2>
+        <h2>I'm Eli, short for Elias.</h2>
+        <h5 style="width: 500px">
+          But don't call me Elias unless <span id="random"></span>
+        </h5>
+        <script>
+          let phrases = [
+            "you're my mother and I'm in trouble.",
+            "we're at an award's ceremony and you call me up to the stage.",
+            "we're filling out some official documents.",
+            "we're in the middle of a heated argument and I'm winning.",
+          ];
+          let random = Math.floor(Math.random() * phrases.length);
+          document.getElementById("random").textContent = phrases[random];
+        </script>
         <h3>I'm a Software Engineer by day, avid hobbyist by night.</h3>
+      </div>
+    </div>
+    <!-- Summary -->
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+      "
+    >
+      <p>What you'll find on this site depends on what you're here for...</p>
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          gap: 20px;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div class="card" onclick="expand('business')">
+          <h3>Business</h3>
+          <div id="business" class="hidden">
+            <p>
+              I'm delighted you stopped by! On the next page, you'll find my
+              most up-to-date resume and on the last page, I have a bunch of
+              professional links.
+            </p>
+
+            <p>
+              While you're here, I'll explain that I explicitly designed this
+              site to have all menu-accessible subpages be hosted in their own
+              iframe. Scrolling up and down will only take you to the next page
+              once you scroll to the limit of the current page's iframe. If you
+              find that annoying, tell me! There's no better source of feedback
+              than users directly.
+            </p>
+          </div>
+        </div>
+
+        <p>OR</p>
+
+        <div class="card" onclick="expand('pleasure')">
+          <h3>Pleasure</h3>
+          <div id="pleasure" class="hidden">
+            <p>
+              You're in for a treat! I have a few hidden pages that you'd only
+              be able to find if you check out the source code of this site.
+              Otherwise, I plan on adding some more personal content. What that
+              entails is a secret to everyone!
+            </p>
+          </div>
+        </div>
+
+        <script>
+          function expand(cardName) {
+            let cards = document.getElementsByClassName("card");
+            for (let i = 0; i < cards.length; i++) {
+              cards[i].querySelector("div").classList.add("hidden");
+            }
+            document.getElementById(cardName).classList.remove("hidden");
+          }
+        </script>
       </div>
     </div>
   </body>
