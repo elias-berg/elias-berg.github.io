@@ -28,6 +28,11 @@ body {
   cursor: pointer;
   user-select: none;
   max-width: 400px;
+  background-color: skyblue;
+}
+
+.card:hover {
+  background-color: lightblue;
 }
 
 .card > h3 {
