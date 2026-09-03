@@ -30,6 +30,20 @@ i {
 
 /* Class Styles */
 
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobile-header {
+  display: none;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .header-image {
   border-radius: 100px;
   height: 80px;
@@ -82,13 +96,6 @@ i {
 
 .lightgray {
   background-color: whitesmoke;
-}
-
-.header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .icon-text {
@@ -146,4 +153,18 @@ i {
 .footer {
   font-size: 10px;
   text-align: center;
+}
+
+@media only screen and (max-width: 768px) {
+  .header {
+    display: none;
+  }
+
+  .mobile-header {
+    display: flex;
+  }
+
+  .mobile-hide {
+    display: none;
+  }
 }
