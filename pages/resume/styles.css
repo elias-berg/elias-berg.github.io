@@ -40,8 +40,9 @@ i {
 .mobile-header {
   display: none;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: start;
   align-items: center;
+  gap: 20px;
 }
 
 .header-image {
