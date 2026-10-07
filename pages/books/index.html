@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="../../theme.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <h2>Book Log</h2>
+    <h3>The goal: read at least one book per month/more than 12 books per year!</h3>
+    <div id="books">
+        <!-- Books will go here! -->
+    </div>
+    <script>
+      async function fetchBooks() {
+        const container = document.getElementById("books");
+
+        ["2024", "2025", "2026"].reverse().forEach(async (year) => {
+          const response = await fetch(`./years/${year}.txt`);
+          const responseText = await response.text();
+          
+          const yearContainer = document.createElement("div");
+          const yearTitle = document.createElement("h4");
+          yearTitle.innerText = year;
+          yearContainer.appendChild(yearTitle);
+
+          const yearBookList = document.createElement("ol");
+          const books = responseText.split("\n");
+          for (book of books) {
+            bookItem = document.createElement("li");
+            bookItem.innerText = book;
+            yearBookList.appendChild(bookItem);
+          }
+          yearContainer.appendChild(yearBookList);
+
+          container.appendChild(yearContainer);
+        })
+      }
+      fetchBooks();
+    </script>
+  </body>
+</html>

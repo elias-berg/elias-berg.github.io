@@ -144,6 +144,15 @@ iframe {
   background-size: cover;
 }
 
+#nav-books .icon {
+  background-image: url("assets/book.svg");
+  background-size: cover;
+}
+#nav-books.active .icon {
+  background-image: url("assets/book-active.svg");
+  background-size: cover;
+}
+
 #nav-footer .icon {
   background-image: url("assets/links.svg");
   background-size: cover;
