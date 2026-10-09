@@ -10,10 +10,8 @@
         <!-- Books will go here! -->
     </div>
     <script>
-      async function fetchBooks() {
-        const container = document.getElementById("books");
-
-        ["2024", "2025", "2026"].reverse().forEach(async (year) => {
+      const container = document.getElementById("books");
+      async function fetchBooks(year) {
           const response = await fetch(`./years/${year}.txt`);
           const responseText = await response.text();
           
@@ -25,16 +23,30 @@
           const yearBookList = document.createElement("ol");
           const books = responseText.split("\n");
           for (book of books) {
+            const [title, month, isbn] = book.split("|");
             bookItem = document.createElement("li");
-            bookItem.innerText = book;
+            if (!!isbn) {
+              bookItem.innerHTML = `<a href='https://www.isbnsearch.org/isbn/${isbn}' target='_blank'>${title + " (" + month + ")"}<div style="width: 150px; height: 225px; background: url(https://images.isbndb.com/covers/8348053482663.jpg); background-size: contain;"></div></a>`;
+            } else {
+              bookItem.innerText = title + " (" + month + ")";
+            }
             yearBookList.appendChild(bookItem);
           }
           yearContainer.appendChild(yearBookList);
-
-          container.appendChild(yearContainer);
-        })
+          return yearContainer;
       }
-      fetchBooks();
+
+      async function hydrateBooks() {
+        const byYear = {};
+        const promises = [];
+        await Promise.all([2024, 2025, 2026].map((year) => 
+          fetchBooks(year).then((div) => byYear[year] = div)
+        ));
+        for (year of Object.values(byYear)) {
+          container.appendChild(year);
+        }
+      }
+      hydrateBooks();
     </script>
   </body>
 </html>

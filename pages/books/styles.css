@@ -10,7 +10,32 @@ body {
 
 #books {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
   gap: 20px;
+}
+
+.book-year {
+  width: 300px;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+a > div {
+  display: none;
+}
+
+a:hover {
+  color: blue;
+  cursor: pointer;
+}
+
+a:hover > div {
+  display: block;
+  position: relative;
+  top: 0;
+  right: 0;
 }
