@@ -17,6 +17,10 @@
           <span class="icon" alt="resume"></span>
           <span class="text">Resume</span>
         </div>
+        <div id="nav-books" class="nav-item" onclick="navigate('books')">
+          <span class="icon" alt="books"></span>
+          <span class="text">Books</span>
+        </div>
         <div id="nav-footer" class="nav-item" onclick="navigate('footer')">
           <span class="icon" alt="footer"></span>
           <span class="text">Links</span>
@@ -24,18 +28,20 @@
       </div>
     </aside>
 
-    <iframe id="home" src="./pages/home/index.html"></iframe>
-    <iframe id="resume" src="./pages/resume/index.html"></iframe>
-    <iframe id="footer" src="./pages/footer/index.html"></iframe>
+    <iframe id="home" src="./pages/home/index.html" loading="lazy"></iframe>
+    <iframe id="resume" src="./pages/resume/index.html" loading="lazy"></iframe>
+    <iframe id="books" src="./pages/books/index.html" loading="lazy"></iframe>
+    <iframe id="footer" src="./pages/footer/index.html" loading="lazy"></iframe>
 
     <!-- Scrolling logic -->
     <script>
       // Get the pages for reference in the scroll logic
       const home = document.getElementById("home");
       const resume = document.getElementById("resume");
+      const books = document.getElementById("books");
       const footer = document.getElementById("footer");
 
-      const pages = [home, resume, footer];
+      const pages = [home, resume, books, footer];
 
       // On page load, check if there's a hash in the URL and navigate to the corresponding section.
       // This is mostly to ensure that in mobile mode, we show the active page in the menu at the bottom.
