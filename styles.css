@@ -126,38 +126,34 @@ iframe {
   ICON STYLES
 */
 
+.icon {
+  background-size: cover;
+}
+
 #nav-home .icon {
   background-image: url("assets/home.svg");
-  background-size: cover;
 }
 #nav-home.active .icon {
   background-image: url("assets/home-active.svg");
-  background-size: cover;
 }
 
 #nav-resume .icon {
   background-image: url("assets/file.svg");
-  background-size: cover;
 }
 #nav-resume.active .icon {
   background-image: url("assets/file-active.svg");
-  background-size: cover;
 }
 
 #nav-books .icon {
   background-image: url("assets/book.svg");
-  background-size: cover;
 }
 #nav-books.active .icon {
   background-image: url("assets/book-active.svg");
-  background-size: cover;
 }
 
 #nav-footer .icon {
   background-image: url("assets/links.svg");
-  background-size: cover;
 }
 #nav-footer.active .icon {
   background-image: url("assets/links-active.svg");
-  background-size: cover;
 }
