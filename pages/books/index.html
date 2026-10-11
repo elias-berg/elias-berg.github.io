@@ -4,29 +4,90 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <h2>Book Log</h2>
-    <h3>The goal: read at least one book per month/more than 12 books per year!</h3>
-    <div id="books">
-        <!-- Books will go here! -->
+    <div class="header">
+      <h1 style="align-self: center;">Book Log</h1>
+      <h4>Goal: <span>Read at least 12 books per year.</span></h4>
+      <h4>Format: <span>#. Title (Month Finished)</span></h4>
+      <h4>Easter Eggs: <span>Can you tell which books I slogged through?</span></h4>
+    </div>
+    <div id="book-log">
+      <!--
+      This section is split into 3 parts:
+      1. The year selector. It will always select the current year first!
+      2. The list of books for the selected year.
+      3. The book cover image for the current-hovered book.
+      -->
+      <div id="years"></div>
+      <div id="books"></div>
+      <div id="book-cover"></div>
     </div>
     <script>
-      const container = document.getElementById("books");
+      const loaded = {};
+      const yearsContainer = document.getElementById("years");
+      const spinner = document.createElement("div");
+      spinner.classList.add("spinner");
+
+      const currentYear = new Date().getFullYear();
+      let cur = currentYear;
+      // I started keeping track in 2024, hence the magic number.
+      while (cur >= 2024) {
+        const yearButton = document.createElement("button");
+        yearButton.innerText = cur;
+        yearButton.addEventListener("click", (e) => {
+          button = e.target;
+
+          // First, remove the "active" state from the previously active button
+          document.querySelectorAll(`#years button`).forEach((button) => {
+            button.classList.remove("selected");
+          });
+          button.classList.add("selected");
+
+          // Lazy loading the books
+          if (!loaded[button.innerText]) {
+            // Loading spinner while we fetch!
+            document.getElementById("books").replaceChildren(spinner);
+
+            fetchBooks(button.innerText).then((div) => {
+              loaded[button.innerText] = div; // Cache in memory
+              document.getElementById("books").replaceChildren(div);
+            });
+          } else {
+              document.getElementById("books").replaceChildren(loaded[button.innerText]);
+          }
+        });
+        yearsContainer.appendChild(yearButton);
+
+        if (cur === currentYear) {
+          setTimeout(() => {
+            yearButton.click();
+          }, 0);
+        }
+
+        // Onto the next year!
+        cur--;
+      }
+
+
       async function fetchBooks(year) {
           const response = await fetch(`./years/${year}.txt`);
           const responseText = await response.text();
           
           const yearContainer = document.createElement("div");
-          const yearTitle = document.createElement("h4");
-          yearTitle.innerText = year;
-          yearContainer.appendChild(yearTitle);
 
           const yearBookList = document.createElement("ol");
           const books = responseText.split("\n");
           for (book of books) {
-            const [title, month, isbn] = book.split("|");
+            const [title, month, isbn, coverSrc] = book.split("|");
             bookItem = document.createElement("li");
             if (!!isbn) {
-              bookItem.innerHTML = `<a href='https://www.isbnsearch.org/isbn/${isbn}' target='_blank'>${title + " (" + month + ")"}<div style="width: 150px; height: 225px; background: url(https://images.isbndb.com/covers/8348053482663.jpg); background-size: contain;"></div></a>`;
+              const link = document.createElement("a");
+              link.href = `https://www.isbnsearch.org/isbn/${isbn}`;
+              link.target = "_blank";
+              link.innerText = title + " (" + month + ")";
+              if (!!coverSrc) {
+                link.setAttribute("data-cover-source", `https://images.isbndb.com/covers/${coverSrc}.jpg`);
+              }
+              bookItem.appendChild(link);
             } else {
               bookItem.innerText = title + " (" + month + ")";
             }
@@ -36,17 +97,22 @@
           return yearContainer;
       }
 
-      async function hydrateBooks() {
-        const byYear = {};
-        const promises = [];
-        await Promise.all([2024, 2025, 2026].map((year) => 
-          fetchBooks(year).then((div) => byYear[year] = div)
-        ));
-        for (year of Object.values(byYear)) {
-          container.appendChild(year);
+      // We want to show the book cover when the user hovers over a book link,
+      // so we'll use window-level mouseover and mouseoutevents
+
+      window.addEventListener("mouseover", (e) => {
+        if (e.target.tagName === "A" && e.target.hasAttribute("data-cover-source")) {
+          const coverSrc = e.target.getAttribute("data-cover-source");
+          const bookCover = document.getElementById("book-cover");
+          bookCover.innerHTML = `<img src="${coverSrc}" alt="Book Cover" />`;
         }
-      }
-      hydrateBooks();
+      });
+
+      window.addEventListener("mouseout", (e) => {
+        if (e.target.tagName === "A") {
+          document.getElementById("book-cover").replaceChildren();
+        }
+      });
     </script>
   </body>
 </html>
