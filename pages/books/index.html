@@ -19,7 +19,10 @@
       -->
       <div id="years"></div>
       <div id="books"></div>
-      <div id="book-cover"></div>
+      <div id="book-cover">
+        <img id="cover" src="" alt="Book Cover" class="nodisp" />
+        <div id="placeholder">Hover over a book to see its cover!</div>
+      </div>
     </div>
     <script>
       const loaded = {};
@@ -103,14 +106,22 @@
       window.addEventListener("mouseover", (e) => {
         if (e.target.tagName === "A" && e.target.hasAttribute("data-cover-source")) {
           const coverSrc = e.target.getAttribute("data-cover-source");
-          const bookCover = document.getElementById("book-cover");
-          bookCover.innerHTML = `<img src="${coverSrc}" alt="Book Cover" />`;
+          const placeholder = document.getElementById("placeholder");
+          placeholder.classList.add("nodisp");
+          const bookCover = document.getElementById("cover");
+          bookCover.src = coverSrc;
+          bookCover.classList.remove("nodisp");
         }
       });
 
       window.addEventListener("mouseout", (e) => {
-        if (e.target.tagName === "A") {
-          document.getElementById("book-cover").replaceChildren();
+        if (e.target.tagName === "A" && e.target.hasAttribute("data-cover-source")) {
+          const placeholder = document.getElementById("placeholder");
+          placeholder.classList.remove("nodisp");
+
+          const bookCover = document.getElementById("cover");
+          bookCover.src = "";
+          bookCover.classList.add("nodisp");
         }
       });
     </script>

@@ -65,6 +65,8 @@
         }
       };
 
+      window.onresize = window.onload; // Re-run the logic on resize to ensure the correct section is highlighted.
+
       // Block cascading scrolling events when we're programmatically scrolling to a section after a menu click or debounce.
       let isAutoScrolling = false;
       const navigate = (id) => {
