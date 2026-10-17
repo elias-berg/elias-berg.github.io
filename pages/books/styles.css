@@ -19,10 +19,19 @@ h4 > span {
 
 #book-log {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
   gap: 20px;
   width: 100%;
+}
+
+#books-years {
+  width: 100%;
+}
+
+#years, #books {
+  min-width: 49%;
+  max-width: 49%;
 }
 
 #years {
@@ -32,24 +41,38 @@ h4 > span {
   gap: 10px;
 }
 
-#years, #books, #book-cover {
-  width: 33%;
-  max-width: 33%;
+#years > button {
+  width: 150px;
 }
 
-a {
+li {
   text-decoration: none;
   color: black;
+  border: 1px solid transparent;
+  padding: 2px;
+  border-radius: 5px;
 }
 
-a:hover {
-  color: blue;
+li:hover {
+  background-color: lightgray;
   cursor: pointer;
+}
+
+#book-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 #book-cover > * {
   max-width: 100%;
   max-height: 100%;
+}
+
+#cover {
+  cursor: pointer;
+  border: 1px dotted transparent;
 }
 
 #placeholder {
@@ -83,7 +106,7 @@ button:hover {
   background-color: lightgray;
 }
 
-button.selected {
+.selected {
   color: black;
   background-color: skyblue;
   border: 1px solid black;

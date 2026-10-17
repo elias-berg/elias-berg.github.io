@@ -17,11 +17,13 @@
       2. The list of books for the selected year.
       3. The book cover image for the current-hovered book.
       -->
-      <div id="years"></div>
-      <div id="books"></div>
+      <div id="years-books" style="display: flex; flex-direction: row;">
+        <div id="years"></div>
+        <div id="books"></div>
+      </div>
       <div id="book-cover">
         <img id="cover" src="" alt="Book Cover" class="nodisp" />
-        <div id="placeholder">Hover over a book to see its cover!</div>
+        <div id="placeholder">Click on a book to see its cover!</div>
       </div>
     </div>
     <script>
@@ -35,8 +37,12 @@
       // I started keeping track in 2024, hence the magic number.
       while (cur >= 2024) {
         const yearButton = document.createElement("button");
+        yearButton.id = `year-${cur}`;
         yearButton.innerText = cur;
         yearButton.addEventListener("click", (e) => {
+          // Clear any previously selected book
+          clearBook();
+
           button = e.target;
 
           // First, remove the "active" state from the previously active button
@@ -48,28 +54,26 @@
           // Lazy loading the books
           if (!loaded[button.innerText]) {
             // Loading spinner while we fetch!
+            loaded[button.innerText] = spinner;
             document.getElementById("books").replaceChildren(spinner);
 
             fetchBooks(button.innerText).then((div) => {
               loaded[button.innerText] = div; // Cache in memory
               document.getElementById("books").replaceChildren(div);
             });
-          } else {
-              document.getElementById("books").replaceChildren(loaded[button.innerText]);
           }
+          document.getElementById("books").replaceChildren(loaded[button.innerText]);
         });
         yearsContainer.appendChild(yearButton);
-
-        if (cur === currentYear) {
-          setTimeout(() => {
-            yearButton.click();
-          }, 0);
-        }
 
         // Onto the next year!
         cur--;
       }
 
+      // Load the first year!
+      setTimeout(() => {
+        document.getElementById(`year-${currentYear}`).click();
+      }, 0);
 
       async function fetchBooks(year) {
           const response = await fetch(`./years/${year}.txt`);
@@ -81,19 +85,15 @@
           const books = responseText.split("\n");
           for (book of books) {
             const [title, month, isbn, coverSrc] = book.split("|");
-            bookItem = document.createElement("li");
+            const bookItem = document.createElement("li");
             if (!!isbn) {
-              const link = document.createElement("a");
-              link.href = `https://www.isbnsearch.org/isbn/${isbn}`;
-              link.target = "_blank";
-              link.innerText = title + " (" + month + ")";
-              if (!!coverSrc) {
-                link.setAttribute("data-cover-source", `https://images.isbndb.com/covers/${coverSrc}.jpg`);
-              }
-              bookItem.appendChild(link);
-            } else {
-              bookItem.innerText = title + " (" + month + ")";
+              bookItem.setAttribute("data-source", `https://www.isbnsearch.org/isbn/${isbn}`);
             }
+            if (!!coverSrc) {
+              bookItem.setAttribute("data-cover-source", `https://images.isbndb.com/covers/${coverSrc}.jpg`);
+              bookItem.addEventListener("click", (e) => selectBook(e));
+            }
+            bookItem.innerText = title + " (" + month + ")";
             yearBookList.appendChild(bookItem);
           }
           yearContainer.appendChild(yearBookList);
@@ -103,27 +103,39 @@
       // We want to show the book cover when the user hovers over a book link,
       // so we'll use window-level mouseover and mouseoutevents
 
-      window.addEventListener("mouseover", (e) => {
-        if (e.target.tagName === "A" && e.target.hasAttribute("data-cover-source")) {
-          const coverSrc = e.target.getAttribute("data-cover-source");
-          const placeholder = document.getElementById("placeholder");
-          placeholder.classList.add("nodisp");
-          const bookCover = document.getElementById("cover");
-          bookCover.src = coverSrc;
-          bookCover.classList.remove("nodisp");
-        }
-      });
+      function selectBook(e) {
+        const book = e.target;
+        const source = book.getAttribute("data-source");
+        const coverSource = book.getAttribute("data-cover-source");
 
-      window.addEventListener("mouseout", (e) => {
-        if (e.target.tagName === "A" && e.target.hasAttribute("data-cover-source")) {
+        // First, remove the "active" state from the previously active book
+        
+        document.querySelectorAll(`#books li`).forEach((li) => {
+          li.classList.remove("selected");
+        });
+        book.classList.add("selected");
+
+        const bookCover = document.getElementById("cover");
+        bookCover.src = coverSource;
+        bookCover.onclick = () => window.open(source, "_blank")
+        bookCover.classList.remove("nodisp");
+
+        const placeholder = document.getElementById("placeholder");
+        placeholder.classList.add("nodisp");
+      }
+
+      function clearBook() {
+          document.querySelectorAll(`#books li`).forEach((li) => {
+            li.classList.remove("selected");
+          });
+
           const placeholder = document.getElementById("placeholder");
           placeholder.classList.remove("nodisp");
 
           const bookCover = document.getElementById("cover");
           bookCover.src = "";
           bookCover.classList.add("nodisp");
-        }
-      });
+      }
     </script>
   </body>
 </html>
