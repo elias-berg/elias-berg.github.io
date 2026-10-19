@@ -1,21 +1,21 @@
-The Fall of Babel|January|
-Dune Messiah|February|
-The Hobbit|March|
-Life, the Universe, and Everything|March|
-So Long and Thanks for All the Fish|April|
-Mostly Harmless|May|
-Project Hail Mary|May|
-Before We Say Goodbye|June|
-Before We Forget Kindness|June|
-Before Our Memory Fades|June|
-Shift|July|
-The Devils|July|
-Dust|August|
-Dungeon Crawler Carl|August|
-Dead Zone|September|
-Carl's Doomsday Scenario|September|
-The Dungeon Anarchist's Cookbook|September|
-The Gate of the Feral Gods|October|
-The Butcher's Masquerade|October|
-The Eye of the Bedlam Bride|November|
-This Inevitable Ruin|December|
+The Fall of Babel|January|9780316518192|18664923482300
+Dune Messiah|February|9780593548448|8474273482399
+The Hobbit|March|9780345235121|24976313482310
+Life, the Universe, and Everything|March|9780297786559|27949123482293
+So Long and Thanks for All the Fish|April|9780517556764|6873763482372
+Mostly Harmless|May|9780517577400|7080123482372
+Project Hail Mary|May|9780593135204|4341833482399
+Before We Say Goodbye|June|9781035023431|13755073482556
+Before We Forget Kindness|June|9781035046287|13983633482556
+Before Your Memory Fades|June|9781035032402|13844783482556
+Shift|July|9780544839649|26930503482381
+The Devils|July|9781250880055|9715483482633
+Dust|August|9780544838260|26916613482381
+Dungeon Crawler Carl|August|9780593820247|11192263482399
+Dead Zone|September|9780670260775|17281213482426
+Carl's Doomsday Scenario|September|9780593820261|11192403482399
+The Dungeon Anarchist's Cookbook|September|9780593820285|11192643482399
+The Gate of the Feral Gods|October|9780593955970|12549493482399
+The Butcher's Masquerade|October|9780593955994|12549733482399
+The Eye of the Bedlam Bride|November|9780593956014|12549933482399
+This Inevitable Ruin|December|9798217190041|6557953488674
