@@ -84,6 +84,9 @@
           const yearBookList = document.createElement("ol");
           const books = responseText.split("\n");
           for (book of books) {
+            if (!book.length) {
+              continue;
+            }
             const [title, month, isbn, coverSrc] = book.split("|");
             const bookItem = document.createElement("li");
             if (!!isbn) {
